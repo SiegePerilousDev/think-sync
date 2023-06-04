@@ -1,6 +1,7 @@
 {
   "name": "think-sync",
   "version": "0.1.0",
+  "proxy": "https://api.anthropic.com",
   "private": true,
   "dependencies": {
     "@cometchat-pro/chat": "^3.0.0",

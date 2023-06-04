@@ -1,159 +1,199 @@
-import './Channel.css'
-import { useState, useEffect } from 'react'
-import { Link, useParams, useHistory } from 'react-router-dom'
-import StarBorderOutlinedIcon from '@material-ui/icons/StarBorderOutlined'
-import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined'
-import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined'
-import PersonAddDisabledIcon from '@material-ui/icons/PersonAddDisabled'
-import CallIcon from '@material-ui/icons/Call'
-import CallEndIcon from '@material-ui/icons/CallEnd'
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord'
-import SearchIcon from '@material-ui/icons/Search'
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
-import CloseIcon from '@material-ui/icons/Close'
-import LockIcon from '@material-ui/icons/Lock'
-import Message from '../../components/message/Message'
-import { CometChat } from '@cometchat-pro/chat'
-import { Avatar, Button } from '@material-ui/core'
+import "./Channel.css";
+import { useState, useEffect } from "react";
+import { Link, useParams, useHistory } from "react-router-dom";
+import StarBorderOutlinedIcon from "@material-ui/icons/StarBorderOutlined";
+import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
+import PersonAddOutlinedIcon from "@material-ui/icons/PersonAddOutlined";
+import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
+import CallIcon from "@material-ui/icons/Call";
+import CallEndIcon from "@material-ui/icons/CallEnd";
+import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
+import SearchIcon from "@material-ui/icons/Search";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import CloseIcon from "@material-ui/icons/Close";
+import LockIcon from "@material-ui/icons/Lock";
+import Message from "../../components/message/Message";
+import { CometChat } from "@cometchat-pro/chat";
+import { Avatar, Button } from "@material-ui/core";
+import { chatWithClaude } from "../../chatbot/claude";
 
 function Channel() {
-  const { id } = useParams()
-  const history = useHistory()
-  const [channel, setChannel] = useState(null)
-  const [messages, setMessages] = useState([])
-  const [members, setMembers] = useState([])
-  const [users, setUsers] = useState([])
-  const [keyword, setKeyword] = useState(null)
-  const [currentUser, setCurrentUser] = useState(null)
-  const [message, setMessage] = useState('')
-  const [searching, setSearching] = useState(false)
-  const [toggle, setToggle] = useState(false)
-  const [toggleAdd, setToggleAdd] = useState(false)
-  const [calling, setCalling] = useState(false)
-  const [sessionID, setSessionID] = useState('')
-  const [isIncomingCall, setIsIncomingCall] = useState(false)
-  const [isOutgoingCall, setIsOutgoingCall] = useState(false)
-  const [isLive, setIsLive] = useState(false)
+  const { id } = useParams();
+  const history = useHistory();
+  const [channel, setChannel] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [keyword, setKeyword] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [message, setMessage] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [toggle, setToggle] = useState(false);
+  const [toggleAdd, setToggleAdd] = useState(false);
+  const [calling, setCalling] = useState(false);
+  const [sessionID, setSessionID] = useState("");
+  const [isIncomingCall, setIsIncomingCall] = useState(false);
+  const [isOutgoingCall, setIsOutgoingCall] = useState(false);
+  const [isLive, setIsLive] = useState(false);
 
   const togglerDetail = () => {
-    setToggle(!toggle)
-  }
+    setToggle(!toggle);
+  };
 
   const togglerAdd = () => {
-    setToggleAdd(!toggleAdd)
-  }
+    setToggleAdd(!toggleAdd);
+  };
 
   const findUser = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    searchTerm(keyword)
-  }
+    searchTerm(keyword);
+  };
 
   const searchTerm = (keyword) => {
-    setSearching(true)
-    const limit = 30
+    setSearching(true);
+    const limit = 30;
     const usersRequest = new CometChat.UsersRequestBuilder()
       .setLimit(limit)
       .setSearchKeyword(keyword)
-      .build()
+      .build();
 
     usersRequest
       .fetchNext()
       .then((userList) => {
-        setUsers(userList)
-        setSearching(false)
+        setUsers(userList);
+        setSearching(false);
       })
       .catch((error) => {
-        console.log('User list fetching failed with error:', error)
-        setSearching(false)
-      })
-  }
+        console.log("User list fetching failed with error:", error);
+        setSearching(false);
+      });
+  };
 
   const getMembers = (guid) => {
-    const GUID = guid
-    const limit = 30
+    const GUID = guid;
+    const limit = 30;
     const groupMemberRequest = new CometChat.GroupMembersRequestBuilder(GUID)
       .setLimit(limit)
-      .build()
+      .build();
 
     groupMemberRequest
       .fetchNext()
       .then((groupMembers) => setMembers(groupMembers))
       .catch((error) => {
-        console.log('Group Member list fetching failed with exception:', error)
-      })
-  }
+        console.log(
+          "Group Member list fetching failed with exception:",
+          error
+        );
+      });
+  };
 
   const getChannel = (guid) => {
     CometChat.getGroup(guid)
       .then((group) => setChannel(group))
       .catch((error) => {
-        if (error.code === 'ERR_GUID_NOT_FOUND') history.push('/')
-        console.log('Group details fetching failed with exception:', error)
-      })
-  }
+        if (error.code === "ERR_GUID_NOT_FOUND") history.push("/");
+        console.log("Group details fetching failed with exception:", error);
+      });
+  };
 
   const listenForMessage = (listenerID) => {
     CometChat.addMessageListener(
       listenerID,
       new CometChat.MessageListener({
         onTextMessageReceived: (message) => {
-          setMessages((prevState) => [...prevState, message])
-          scrollToEnd()
+          setMessages((prevState) => [...prevState, message]);
+          scrollToEnd();
         },
       })
-    )
-  }
+    );
+  };
 
   const getMessages = (guid) => {
-    const limit = 50
+    const limit = 50;
 
     const messagesRequest = new CometChat.MessagesRequestBuilder()
       .setLimit(limit)
       .setGUID(guid)
-      .build()
+      .build();
 
     messagesRequest
       .fetchPrevious()
       .then((msgs) => {
-        setMessages(msgs.filter((m) => m.type === 'text'))
-        scrollToEnd()
+        setMessages(msgs.filter((m) => m.type === "text"));
+        scrollToEnd();
       })
       .catch((error) =>
-        console.log('Message fetching failed with error:', error)
-      )
-  }
+        console.log("Message fetching failed with error:", error)
+      );
+  };
 
   const scrollToEnd = () => {
-    const elmnt = document.getElementById('messages-container')
-    elmnt.scrollTop = elmnt.scrollHeight
-  }
+    const elmnt = document.getElementById("messages-container");
+    elmnt.scrollTop = elmnt.scrollHeight;
+  };
 
   const onSubmit = (e) => {
-    e.preventDefault()
-    sendMessage(id, message)
-  }
+    e.preventDefault();
+    sendMessage(id, message);
+  };
 
-  const sendMessage = (guid, message) => {
-    const receiverID = guid
-    const messageText = message
-    const receiverType = CometChat.RECEIVER_TYPE.GROUP
+  const sendMessage = async (guid, message) => {
+    const receiverID = guid;
+    const messageText = message;
+    const receiverType = CometChat.RECEIVER_TYPE.GROUP;
     const textMessage = new CometChat.TextMessage(
       receiverID,
       messageText,
       receiverType
-    )
-
+    );
+  
     CometChat.sendMessage(textMessage)
       .then((message) => {
-        setMessages((prevState) => [...prevState, message])
-        setMessage('')
-        scrollToEnd()
+        setMessages((prevState) => [...prevState, message]);
+        setMessage("");
+        scrollToEnd();
       })
       .catch((error) =>
-        console.log('Message sending failed with error:', error)
-      )
-  }
+        console.log("Message sending failed with error:", error)
+      );
+  
+    // Check if the message starts with "/claude"
+    if (message.trim().toLowerCase().startsWith("/claude")) {
+      const userQuestion = message.replace("/claude", "").trim();
+  
+      // If there's a question after "/claude", get Claude's reply with full chat history
+      if (userQuestion) {
+        const chatHistory = messages
+          .map((msg) =>
+            msg.sender.uid === currentUser.uid
+              ? `Human: ${msg.text}`
+              : `Assistant: ${msg.text}`
+          )
+          .join("\n");
+  
+        const reply = await chatWithClaude(
+          `${chatHistory}\n\nHuman: ${userQuestion}`
+        );
+  
+        // Send the reply to the chat
+        const replyMessage = new CometChat.TextMessage(
+          receiverID,
+          reply,
+          receiverType
+        );
+  
+        CometChat.sendMessage(replyMessage)
+          .then((message) => {
+            setMessages((prevState) => [...prevState, message]);
+            scrollToEnd();
+          })
+          .catch((error) =>
+            console.log("Message sending failed with error:", error)
+          );
+      }
+    }
+  };
 
   const addMember = (guid, uid) => {
     let GUID = guid
