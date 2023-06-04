@@ -16,6 +16,7 @@ import Message from "../../components/message/Message";
 import { CometChat } from "@cometchat-pro/chat";
 import { Avatar, Button } from "@material-ui/core";
 import { chatWithClaude } from "../../chatbot/claude";
+import { generateImageFromText } from "../../imageAPI/stable-diffusion";
 
 function Channel() {
   const { id } = useParams();
@@ -148,6 +149,25 @@ function Channel() {
       receiverType
     );
   
+    const sendImage = async (imagePrompt, receiverID) => {
+      const blob = await generateImageFromText(imagePrompt);
+    
+      if (blob) {
+        const file = new File([blob], "generated-image.png", { type: "image/png" });
+        const receiverType = CometChat.RECEIVER_TYPE.GROUP;
+        const imageMessage = new CometChat.MediaMessage(receiverID, file, receiverType);
+    
+        CometChat.sendMediaMessage(imageMessage)
+          .then((message) => {
+            setMessages((prevState) => [...prevState, message]);
+            scrollToEnd();
+          })
+          .catch((error) =>
+            console.log("Media message sending failed with error:", error)
+          );
+      }
+    };
+
     CometChat.sendMessage(textMessage)
       .then((message) => {
         setMessages((prevState) => [...prevState, message]);
@@ -162,7 +182,6 @@ function Channel() {
     if (message.trim().toLowerCase().startsWith("/claude")) {
       const userQuestion = message.replace("/claude", "").trim();
   
-      // If there's a question after "/claude", get Claude's reply with full chat history
       if (userQuestion) {
         const chatHistory = messages
           .map((msg) =>
@@ -172,28 +191,35 @@ function Channel() {
           )
           .join("\n");
   
-        const reply = await chatWithClaude(
-          `${chatHistory}\n\nHuman: ${userQuestion}`
-        );
-  
-        // Send the reply to the chat
-        const replyMessage = new CometChat.TextMessage(
-          receiverID,
-          reply,
-          receiverType
-        );
-  
-        CometChat.sendMessage(replyMessage)
-          .then((message) => {
-            setMessages((prevState) => [...prevState, message]);
-            scrollToEnd();
-          })
-          .catch((error) =>
-            console.log("Message sending failed with error:", error)
+        chatWithClaude(`${chatHistory}\n\nHuman: ${userQuestion}`).then((reply) => {
+          const replyMessage = new CometChat.TextMessage(
+            receiverID,
+            reply,
+            receiverType
           );
+  
+          CometChat.sendMessage(replyMessage)
+            .then((message) => {
+              setMessages((prevState) => [...prevState, message]);
+              scrollToEnd();
+            })
+            .catch((error) =>
+              console.log("Message sending failed with error:", error)
+            );
+        });
+      }
+    }
+  
+    // Check if the message starts with "/image"
+    if (message.trim().toLowerCase().startsWith("/image")) {
+      const imagePrompt = message.replace("/image", "").trim();
+  
+      if (imagePrompt) {
+        sendImage(imagePrompt, receiverID);
       }
     }
   };
+  
 
   const addMember = (guid, uid) => {
     let GUID = guid
