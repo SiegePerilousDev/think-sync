@@ -1,71 +1,72 @@
-import './Sidebar.css'
-import { useState, useEffect } from 'react'
-import { signOut } from 'firebase/auth'
-import { auth } from '../../firebase'
-import SidebarOption from '../sidebarOption/SidebarOption'
-import CreateIcon from '@material-ui/icons/Create'
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord'
-import InsertCommentIcon from '@material-ui/icons/InsertComment'
-import AlternateEmailIcon from '@material-ui/icons/AlternateEmail'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
-import AddIcon from '@material-ui/icons/Add'
-import { CometChat } from '@cometchat-pro/chat'
-import { Link, useHistory } from 'react-router-dom'
+import './Sidebar.css';
+import { useState, useEffect } from 'react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../firebase';
+import SidebarOption from '../sidebarOption/SidebarOption';
+import CreateIcon from '@material-ui/icons/Create';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import InsertCommentIcon from '@material-ui/icons/InsertComment';
+import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import AddIcon from '@material-ui/icons/Add';
+import SettingsIcon from '@material-ui/icons/Settings'; // Import the SettingsIcon
+import { CometChat } from '@cometchat-pro/chat';
+import { Link, useHistory } from 'react-router-dom';
 
 function Sidebar() {
-  const [channels, setChannels] = useState([])
-  const [user, setUser] = useState(null)
-  const [dms, setDms] = useState([])
-  const history = useHistory()
+  const [channels, setChannels] = useState([]);
+  const [user, setUser] = useState(null);
+  const [dms, setDms] = useState([]);
+  const history = useHistory();
 
   const getDirectMessages = () => {
-    const limit = 10
+    const limit = 10;
     const usersRequest = new CometChat.UsersRequestBuilder()
       .setLimit(limit)
       .friendsOnly(true)
-      .build()
+      .build();
 
     usersRequest
       .fetchNext()
       .then((userList) => setDms(userList))
       .catch((error) => {
-        console.log('User list fetching failed with error:', error)
-      })
-  }
+        console.log('User list fetching failed with error:', error);
+      });
+  };
 
   const getChannels = () => {
-    const limit = 30
+    const limit = 30;
     const groupsRequest = new CometChat.GroupsRequestBuilder()
       .setLimit(limit)
       .joinedOnly(true)
-      .build()
+      .build();
 
     groupsRequest
       .fetchNext()
       .then((groupList) => setChannels(groupList))
       .catch((error) => {
-        console.log('Groups list fetching failed with error', error)
-      })
-  }
+        console.log('Groups list fetching failed with error', error);
+      });
+  };
 
   const logOut = () => {
     signOut(auth)
       .then(() => {
-        localStorage.removeItem('user')
-        history.push('/login')
+        localStorage.removeItem('user');
+        history.push('/login');
       })
-      .catch((error) => console.log(error.message))
-  }
+      .catch((error) => console.log(error.message));
+  };
 
   useEffect(() => {
-    const data = localStorage.getItem('user')
-    setUser(JSON.parse(data))
+    const data = localStorage.getItem('user');
+    setUser(JSON.parse(data));
 
-    getChannels()
-    getDirectMessages()
-  }, [])
+    getChannels();
+    getDirectMessages();
+  }, []);
 
   return (
     <div className="sidebar">
@@ -104,7 +105,7 @@ function Sidebar() {
               key={channel.guid}
               sub="sidebarOption__sub"
             />
-          ) 
+          )
         )}
         <SidebarOption
           Icon={AddIcon}
@@ -126,13 +127,14 @@ function Sidebar() {
             online={dm.status === 'online' ? 'isOnline' : ''}
           />
         ))}
+        <SidebarOption Icon={SettingsIcon} title="Settings" /> {/* Add this line */}
       </div>
 
       <button className="sidebar__logout" onClick={logOut}>
         Logout
       </button>
     </div>
-  )
+  );
 }
 
-export default Sidebar
+export default Sidebar;

@@ -16,7 +16,8 @@ import Message from "../../components/message/Message";
 import { CometChat } from "@cometchat-pro/chat";
 import { Avatar, Button } from "@material-ui/core";
 import { chatWithClaude } from "../../chatbot/claude";
-import { generateImageFromText } from "../../imageAPI/stable-diffusion";
+import axios from 'axios';
+import { auth } from '../../firebase';
 
 function Channel() {
   const { id } = useParams();
@@ -149,25 +150,6 @@ function Channel() {
       receiverType
     );
   
-    const sendImage = async (imagePrompt, receiverID) => {
-      const blob = await generateImageFromText(imagePrompt);
-    
-      if (blob) {
-        const file = new File([blob], "generated-image.png", { type: "image/png" });
-        const receiverType = CometChat.RECEIVER_TYPE.GROUP;
-        const imageMessage = new CometChat.MediaMessage(receiverID, file, receiverType);
-    
-        CometChat.sendMediaMessage(imageMessage)
-          .then((message) => {
-            setMessages((prevState) => [...prevState, message]);
-            scrollToEnd();
-          })
-          .catch((error) =>
-            console.log("Media message sending failed with error:", error)
-          );
-      }
-    };
-
     CometChat.sendMessage(textMessage)
       .then((message) => {
         setMessages((prevState) => [...prevState, message]);
@@ -183,6 +165,7 @@ function Channel() {
       const userQuestion = message.replace("/claude", "").trim();
   
       if (userQuestion) {
+        const expiresInMinutes = 30;
         const chatHistory = messages
           .map((msg) =>
             msg.sender.uid === currentUser.uid
@@ -191,7 +174,11 @@ function Channel() {
           )
           .join("\n");
   
-        chatWithClaude(`${chatHistory}\n\nHuman: ${userQuestion}`).then((reply) => {
+        const userId = auth.currentUser.uid;
+        const response = await axios.get(process.env.REACT_APP_FIREBASE_CLOUD_FUNCTION_URL + '/getApiKey', { params: { userId } });
+        const apiKey = response.data.apiKey;
+  
+        chatWithClaude(`${chatHistory}\n\nHuman: ${userQuestion}`, apiKey, expiresInMinutes).then((reply) => {
           const replyMessage = new CometChat.TextMessage(
             receiverID,
             reply,
@@ -209,17 +196,7 @@ function Channel() {
         });
       }
     }
-  
-    // Check if the message starts with "/image"
-    if (message.trim().toLowerCase().startsWith("/image")) {
-      const imagePrompt = message.replace("/image", "").trim();
-  
-      if (imagePrompt) {
-        sendImage(imagePrompt, receiverID);
-      }
-    }
   };
-  
 
   const addMember = (guid, uid) => {
     let GUID = guid

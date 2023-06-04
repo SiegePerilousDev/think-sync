@@ -1,5 +1,5 @@
-import './SidebarOption.css'
-import { useHistory } from 'react-router-dom'
+import './SidebarOption.css';
+import { useHistory } from 'react-router-dom';
 
 function SidebarOption({
   Icon,
@@ -10,22 +10,25 @@ function SidebarOption({
   user,
   online,
 }) {
-  const history = useHistory()
+  const history = useHistory();
+
   const selectChannel = () => {
     if (id) {
       if (user) {
-        history.push(`/users/${id}`)
+        history.push(`/users/${id}`);
       } else {
-        history.push(`/channels/${id}`)
+        history.push(`/channels/${id}`);
       }
+    } else if (title === 'Settings') {
+      history.push('/settings');
     } else {
-      history.push(title)
+      history.push(title);
     }
-  }
+  };
 
   const addChannel = () => {
-    history.push('/add/channel')
-  }
+    history.push('/add/channel');
+  };
 
   return (
     <div
@@ -41,7 +44,7 @@ function SidebarOption({
         </h3>
       )}
     </div>
-  )
+  );
 }
 
-export default SidebarOption
+export default SidebarOption;

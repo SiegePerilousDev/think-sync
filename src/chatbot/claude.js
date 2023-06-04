@@ -1,7 +1,11 @@
-const apiKey = "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"; // Replace with your actual API key
 const baseUrl = "/v1/complete";
 
-export const chatWithClaude = async (userQuestion) => {
+export const chatWithClaude = async (userQuestion, apiKey) => {
+  if (!apiKey) {
+    console.error("Error: API Key not found.");
+    return "Sorry, your API Key is missing. Please set it in the Settings menu.";
+  }
+
   const prompt = `\n\nHuman: ${userQuestion}\n\nAssistant:`;
 
   try {
