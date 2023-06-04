@@ -4,7 +4,7 @@
     justify-content: space-between;
     padding: 10px 0;
     color: white;
-    background-color: #340e36;
+    background-color: #805163;
   }
   
   .header .MuiSvgIcon-root {
@@ -25,7 +25,7 @@
   
   .header__middle {
     flex: 0.4;
-    background-color: #421f44;
+    background-color: #ffffff;
     text-align: center;
     display: flex;
     padding: 0 50px;

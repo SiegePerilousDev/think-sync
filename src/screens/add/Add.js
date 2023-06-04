@@ -67,7 +67,7 @@ function Add() {
   return (
     <div className="add">
       <form className="add__container">
-        <img src="/logo.png" alt="Slack Logo" />
+        <img src="/logo.png" alt="ThinkSync Logo" />
         <h1>Add New Channel</h1>
         <div className="add__form">
           <input

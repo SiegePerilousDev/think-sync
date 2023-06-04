@@ -12,16 +12,15 @@ function Home() {
   return (
     <div className="home">
       <div className="home__container">
-        <img src="/logo.png" alt="Slack Logo" />
-        <h1>Welcome to Slack</h1>
+        <img src="/logo.png" alt="ThinkSync Logo" />
+        <h1>Welcome to ThinkSync</h1>
         <p>
-          Slack brings all your team communication into one place, makes it all
-          instantly searchable and available wherever you go.
+          Be sure to go to 'Settings' and add your Anthropic API key to get started.
         </p>
 
         <p>
-          Our aim is to make your working life simpler, more pleasant and more
-          productive.
+          Use the command /claude to call your AI assistant in any channel. Ask a question
+          and it will read the chat history for a response!
         </p>
 
         <Button onClick={addChannel}>Create Channel</Button>

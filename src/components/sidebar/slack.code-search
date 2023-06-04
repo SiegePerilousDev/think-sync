@@ -1,0 +1,6 @@
+# Query: slack
+
+1 result - 1 file
+
+src\components\sidebar\Sidebar.css:
+  3:     background-color: var(--thinksync-color);

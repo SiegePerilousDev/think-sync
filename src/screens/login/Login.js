@@ -61,10 +61,10 @@ function Login() {
   return (
     <div className="login">
       <div className="login__container">
-        <img src={'/logo.png'} alt="Slack Logo" />
+        <img src={'/logo.png'} alt="ThinkSync Logo" />
 
-        <h4>Sign in to CometChat</h4>
-        <p>cometchat.slack.com</p>
+        <h4>Sign in to ThinkSync</h4>
+        <p>cometchat.thinksync.com</p>
         <Button onClick={signIn}>
           {!loading ? 'Sign In With Google' : <div id="loading"></div>}
         </Button>

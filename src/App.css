@@ -1,5 +1,5 @@
 body {
-  --slack-color: #3f0e40;
+  --thinksync-color: #036d43;
   overflow: hidden;
 }
 
@@ -59,7 +59,7 @@ body {
   cursor: pointer;
 }
 .popup .close:hover {
-  color: var(--slack-color);
+  color: var(--thinksync-color);
 }
 .popup .content {
   max-height: 30%;
@@ -90,7 +90,7 @@ body {
 
 #add-channel-form > .form-btn:hover {
   color: white;
-  background-color: var(--slack-color);
+  background-color: var(--thinksync-color);
   transition: all 0.3s ease-in-out;
 }
 

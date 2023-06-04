@@ -1,6 +1,6 @@
 .sidebar {
     color: white;
-    background-color: var(--slack-color);
+    background-color: var(--thinksync-color);
     border-top: 1px solid #49274b;
     max-width: 260px;
     flex: 0.3;
@@ -81,7 +81,7 @@
     padding: 10px 0;
     outline: none;
     border: none;
-    background-color: #340e36;
+    background-color: #805163;
     color: white;
     cursor: pointer;
   }
